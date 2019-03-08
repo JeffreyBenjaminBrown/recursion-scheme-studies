@@ -1,0 +1,2 @@
+studies, starting here:
+https://blog.sumtypeofway.com/an-introduction-to-recursion-schemes/
