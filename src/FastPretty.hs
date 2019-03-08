@@ -1,5 +1,9 @@
 module FastPretty where
 
+import Text.PrettyPrint (Doc)
+import qualified Text.PrettyPrint as Pretty
+
+import Expr
 import Lib
 
 
