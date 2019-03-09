@@ -83,7 +83,7 @@ forHisto :: CVAlgebra AbcF Int -- ^ histo forHisto aTerm_abc_histo
 forHisto abc = case abc of
   AF -> 0
   BF a -> 1 + attribute a
-          + (if returned_2 a then 100 else 0)
+          + (if history_has_a_2 a then 100 else 0)
   CF a b -> 1 + attribute a + attribute b
   where
     history_has_a_2 :: Attr AbcF Int -> Bool -- TODO ? use `cata` here
@@ -92,5 +92,14 @@ forHisto abc = case abc of
     history_has_a_2 (Attr _ (BF i))   = history_has_a_2 i
     history_has_a_2 (Attr _ (CF i j)) = history_has_a_2 i || history_has_a_2 j
 
---forFutu :: CVCoalgebra AbcF Int
---forFutu
+forFutu :: CVCoalgebra AbcF Int -- ^ unTerm_abc $ futu forFutu 0
+forFutu i
+  | i < 2 = CF (Automatic $ i+1) (Automatic $ i+2)
+  | i < 4 = BF (Automatic $ i+1)
+  | i < 6 = CF (Manual $ BF $ Automatic $ i+1) (Manual AF)
+    -- Here is the clause that `apo` cannot handle. When the `RCoalgebra`
+    -- handed to `apo` returns a `Left`, it is a complete term.
+    -- Analogously, when the `CVCoalgebra` handed to `futu` returns a
+    -- `Manual` (call it "m"), there can still be some `Automatic` 
+    -- computation left to process in the depths of "m".
+  | otherwise = AF

@@ -71,6 +71,7 @@ histo h = worker >>> attribute where
 data CoAttr f a = Automatic a
                 | Manual (f (CoAttr f a))
 type CVCoalgebra f a = a -> f (CoAttr f a)
+
 futu :: forall a f. Functor f => CVCoalgebra f a -> a -> Term f
 futu c = In <<< fmap worker <<< c where
   worker :: CoAttr f a -> Term f
