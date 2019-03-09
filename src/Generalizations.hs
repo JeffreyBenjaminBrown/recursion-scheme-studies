@@ -21,3 +21,8 @@ cata'' f = histo $ fmap attribute >>> f
 para'' :: Functor f => RAlgebra f a -> Term f -> a
 para'' f = histo $ fmap worker >>> f where
   worker (Attr a h) = (In (fmap (worker >>> fst) h), a)
+
+-- | Skipped: generalizing ana and apo with futu (part IV, time)
+-- https://blog.sumtypeofway.com/recursion-schemes-part-iv-time-is-of-the-essence/
+
+

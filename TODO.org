@@ -10,6 +10,12 @@ go curr@(Next attr) = let
 https://blog.sumtypeofway.com/recursion-schemes-part-iii-folds-in-context/
 ** Where is `ana`'s dual concept to `cata`'s "paired source value"?
 Symbolically, the duality is clear. Conceptually, though, why the dual of a (value, value's history) is an Either value (someting becoming a value) is mysterious to me.
+** Is the Branch case in `sow` more complex than necessary?
+Would this look similar?
+    (Branch, _)  -> Fork (Automatic left)
+                         (Manual Bloom)
+                         (Automatic right)
+And in that case, because there are no nested CVAttr values (i.e. no Manuals containing Automatics), could it be implemented with an apomorphism instead of a futumorphism?
 ** asked
 https://github.com/patrickt/recschemes/issues/5
 *** What's up with the cata laws?
@@ -44,4 +50,7 @@ https://github.com/patrickt/recschemes/issues/5
  "In the previous post, we defined ana, the anamorphism"
  (and section 1 makes a similar claim).
 * suggestions
+** Stop|Continue v. Automatic|Manual
 In Section 4, sometimes he uses Stop and Continue, sometimes Continue and Manual, sometimes Manual and AUtomatic.
+** in the definition of `sow`, the case height=0 need not be considered
+see section 3 of the blog, or my program src/Plant.hs

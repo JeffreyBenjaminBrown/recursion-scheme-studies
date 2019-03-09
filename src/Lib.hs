@@ -20,7 +20,7 @@ bottomUp f = out >>> fmap (bottomUp f) >>> In >>> f
 
 -- | = Section 2
 
-type Algebra f a = f a -> a -- ^ "Cata" ~ "collapse" (ala "catastrophe").
+type Algebra f a = f a -> a -- ^ "Cata" ~ "collapse"
 cata :: (Functor f) => Algebra f a -> Term f -> a  -- ^ a bottom-up fold
 cata alg = out >>> fmap (cata alg) >>> alg
 
@@ -54,12 +54,14 @@ apo r = In <<< fmap (either id $ apo r) <<< r
 
 
 -- | = Section 4: histomorphisms, futumorphisms
+-- "CV" = "course-of-value"
 
 -- | The `hole` is intended to record the entire history
 -- that gave rise to the `attribute`. (Compare to `RAlgebra`.)
+-- `Attr` ~ the Free monad, and `CoAttr` ~ the CoFree one.
 data Attr f a = Attr { attribute :: a
                      , hole      :: f (Attr f a) }
-type CVAlgebra f a = f (Attr f a) -> a -- ^ CV = "course-of-value"
+type CVAlgebra f a = f (Attr f a) -> a
 histo :: forall a f. Functor f => CVAlgebra f a -> Term f -> a
 histo h = worker >>> attribute where
   worker :: Term f -> Attr f a
