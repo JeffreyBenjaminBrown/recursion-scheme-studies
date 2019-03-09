@@ -6,7 +6,9 @@ https://blog.sumtypeofway.com/an-introduction-to-recursion-schemes/
 at the later of the two appearances of this phrase
 go curr@(Next attr) = let
 * questions
+** How to use a recursion scheme for Jbb.Abc.returned_2?
 ** Why are RAlgebra and RAlgebra' equivalent?
+Jbb.Abc demonstrates it -- but I still lack intuition.
 https://blog.sumtypeofway.com/recursion-schemes-part-iii-folds-in-context/
 ** Where is `ana`'s dual concept to `cata`'s "paired source value"?
 Symbolically, the duality is clear. Conceptually, though, why the dual of a (value, value's history) is an Either value (someting becoming a value) is mysterious to me.
