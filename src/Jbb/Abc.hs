@@ -16,16 +16,16 @@ data AbcF a = AF | BF a | CF a a
 -- | = convert between AbcF and Abc
 
 unTerm_abc :: Term AbcF -> Abc
-unTerm_abc = cata homo where homo :: Algebra AbcF Abc
-                             homo AF       = A
-                             homo (BF x)   = B x
-                             homo (CF x y) = C x y
+unTerm_abc = cata iso where iso :: Algebra AbcF Abc
+                            iso AF       = A
+                            iso (BF x)   = B x
+                            iso (CF x y) = C x y
 
 term_abc :: Abc -> Term AbcF
-term_abc = ana homo where homo :: Coalgebra AbcF Abc
-                          homo A       = AF
-                          homo (B x)   = BF x
-                          homo (C x y) = CF x y
+term_abc = ana iso where iso :: Coalgebra AbcF Abc
+                         iso A       = AF
+                         iso (B x)   = BF x
+                         iso (C x y) = CF x y
 
 
 -- | = `cata` and `ana`
@@ -73,9 +73,10 @@ forApo i | i < 4     = BF $ Right $ i+1
 
 -- | = `histo` and `futu`
 
--- | `forHisto` gives a 100 point bonus to exactly one of these.
+-- | `forHisto` gives a 100 point bonus to the longer one,
+-- because at some point in the fold's history it returns 2.
 aTerm_abc_histo, aTerm_abc_histo' :: Term AbcF
-aTerm_abc_histo = In $ BF $ In $ BF $ In AF
+aTerm_abc_histo  = In $ BF $ In $ BF $ In AF
 aTerm_abc_histo' = In $ BF $ In $ BF $ In $ BF $ In AF
 
 forHisto :: CVAlgebra AbcF Int -- ^ histo forHisto aTerm_abc_histo
@@ -85,12 +86,11 @@ forHisto abc = case abc of
           + (if returned_2 a then 100 else 0)
   CF a b -> 1 + attribute a + attribute b
   where
-  -- TODO : How to use a recursion scheme for returned_2?
-  returned_2 :: Attr AbcF Int -> Bool
-  returned_2 (Attr 2 _)        = True
-  returned_2 (Attr _ AF)       = False
-  returned_2 (Attr _ (BF i))   = returned_2 i
-  returned_2 (Attr _ (CF i j)) = returned_2 i || returned_2 j
+    history_has_a_2 :: Attr AbcF Int -> Bool -- TODO ? use `cata` here
+    history_has_a_2 (Attr 2 _)        = True
+    history_has_a_2 (Attr _ AF)       = False
+    history_has_a_2 (Attr _ (BF i))   = history_has_a_2 i
+    history_has_a_2 (Attr _ (CF i j)) = history_has_a_2 i || history_has_a_2 j
 
 --forFutu :: CVCoalgebra AbcF Int
 --forFutu

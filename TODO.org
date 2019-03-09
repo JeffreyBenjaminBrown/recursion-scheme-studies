@@ -18,7 +18,7 @@ Would this look similar?
                          (Manual Bloom)
                          (Automatic right)
 And in that case, because there are no nested CVAttr values (i.e. no Manuals containing Automatics), could it be implemented with an apomorphism instead of a futumorphism?
-** asked
+** [#A] asked
 https://github.com/patrickt/recschemes/issues/5
 *** What's up with the cata laws?
  In [part 2](https://blog.sumtypeofway.com/recursion-schemes-part-2/) I'm confused by the laws. The first is stated as an equation: `cata In = id`. That's clear. But the second is stated as an implication:
@@ -42,15 +42,18 @@ https://github.com/patrickt/recschemes/issues/5
  ```
 
  Is that `==>` symbol again supposed to be `=`? And why does it stipulate types for `alg` and `func`, without ever using them?
+** DONE solved|stale I think
+*** Sections I and III claim Section II defines ana
+Whatever, I figured it out.
+Section III: "In the previous post, we defined ana, the anamorphism"
 *** The code for para generalizing cata appears to be broken
- (In section 3 of the blog series.)
- It is this:
-   cata' :: Functor f => Algebra f a -> Term f -> a
-   cata' = para'' (const f)
- But f is not defined, except as a type constraint.
-*** Section III claims Section II defined ana
- "In the previous post, we defined ana, the anamorphism"
- (and section 1 makes a similar claim).
+I think I solved it.
+
+(In section 3 of the blog series.)
+It is this:
+  cata' :: Functor f => Algebra f a -> Term f -> a
+  cata' = para'' (const f)
+But f is not defined, except as a type constraint.
 * suggestions
 ** Stop|Continue v. Automatic|Manual
 In Section 4, sometimes he uses Stop and Continue, sometimes Continue and Manual, sometimes Manual and AUtomatic.
