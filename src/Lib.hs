@@ -40,13 +40,14 @@ para :: Functor f => RAlgebra f a -> Term f -> a
 para alg = out >>> fmap (id &&& para alg) >>> alg
   -- ^ (id &&& para f) = \t -> (t, para rAlg t)
 
+-- | `Jbb.Abc.forPara` and `forPara'` shows how `RAlgebra` ~ `RAlgebra'`
 type RAlgebra' f a = Term f -> f a -> a
 para' :: Functor f => RAlgebra' f a -> Term f -> a
 para' alg t = out t & fmap (para' alg) & alg t
 
 -- | `RCoalgebra` is dual to `RAlgebra`: reverse arrows, swap (*) for (+).
 type RCoalgebra f a = a -> f (Either (Term f) a)
--- | `apo`, xdual to `para`, is an Either-ish unfolding.
+-- | `apo`, dual to `para`, is an Either-ish unfolding.
 apo :: Functor f => RCoalgebra f a -> a -> Term f
 apo r = In <<< fmap (either id $ apo r) <<< r
   -- ^ either = |||, so we could instead write
