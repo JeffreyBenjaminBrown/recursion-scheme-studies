@@ -10,10 +10,8 @@ import Lib
 
 type Cent = Int
 
-data Nat a
-    = Zero
-    | Next a
-    deriving Functor
+data Nat a = Zero
+           | Next a deriving Functor
 
 zero, one :: Term Nat
 zero = In Zero

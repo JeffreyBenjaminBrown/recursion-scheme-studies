@@ -1,6 +1,8 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Lib where
 
-import Control.Arrow ((&&&),(|||))
+import Control.Arrow ((&&&))
 import Control.Category hiding ((.),id)
 import Data.Function ((&))
 
@@ -18,41 +20,33 @@ bottomUp f = out >>> fmap (bottomUp f) >>> In >>> f
 
 -- | = Section 2
 
--- | bottomUp f = cata (In >>> f)
--- Called a "cata"morphism because the input collapses.
-type Algebra f a = f a -> a
-cata :: (Functor f) => Algebra f a -> Term f -> a
+type Algebra f a = f a -> a -- ^ "Cata" ~ "collapse" (ala "catastrophe").
+cata :: (Functor f) => Algebra f a -> Term f -> a  -- ^ a bottom-up fold
 cata alg = out >>> fmap (cata alg) >>> alg
 
--- | gleaned from section 3; was supposed to be in 2
--- ana is the dual of cata
 type Coalgebra f a = a -> f a
-ana :: (Functor f) => Coalgebra f a -> a -> Term f
-ana c = In  <<< fmap (ana c) <<< c
+ana :: (Functor f) => Coalgebra f a -> a -> Term f -- ^ a top-down unfold
+ana c = In <<< fmap (ana c) <<< c
 
 
 -- | = Section 3
 -- https://blog.sumtypeofway.com/recursion-schemes-part-iii-folds-in-context/
 
+-- | The `Term` is intended to record the origin of the paired `a`.
 type RAlgebra f a = f (Term f, a) -> a
--- | Called a "para"morphism because the original Term f is
--- carried alongside the `a` that it was transformed into.
+-- | `para` is like `cata`, but the original Term f is carried alongside
+-- ("in parallel" to) the `a` that it was transformed into.
 para :: Functor f => RAlgebra f a -> Term f -> a
 para alg = out >>> fmap (id &&& para alg) >>> alg
-  -- (id &&& para f) = \t -> (t, para rAlg t)
+  -- ^ (id &&& para f) = \t -> (t, para rAlg t)
 
 type RAlgebra' f a = Term f -> f a -> a
 para' :: Functor f => RAlgebra' f a -> Term f -> a
 para' alg t = out t & fmap (para' alg) & alg t
 
--- | `para'` generalizes `cata
--- Did not compile until I provided the argument in the definition.
--- I'm guessing it's correct now but I"m waiting for confirmation from PT.
-cata' :: Functor f => Algebra f a -> Term f -> a
-cata' alg = para' $ const alg
-
+-- | `RCoalgebra` is dual to `RAlgebra`: reverse arrows, swap (*) for (+).
 type RCoalgebra f a = a -> f (Either (Term f) a)
-
+-- | `apo`, xdual to `para`, is an Either-ish unfolding.
 apo :: Functor f => RCoalgebra f a -> a -> Term f
 apo r = In <<< fmap (either id $ apo r) <<< r
   -- ^ either = |||, so we could instead write
@@ -61,18 +55,21 @@ apo r = In <<< fmap (either id $ apo r) <<< r
 
 -- | = Section 4: histomorphisms, futumorphisms
 
+-- | The `hole` is intended to record the entire history
+-- that gave rise to the `attribute`. (Compare to `RAlgebra`.)
 data Attr f a = Attr { attribute :: a
                      , hole      :: f (Attr f a) }
-
 type CVAlgebra f a = f (Attr f a) -> a -- ^ CV = "course-of-value"
-
--- | somehow this implementation doesn't share values properly
-histo_inefficient :: Functor f => CVAlgebra f a -> Term f -> a
-histo_inefficient h = out >>> fmap worker >>> h where
-  worker t = Attr (histo_inefficient h t)
-             (fmap worker $ out t)
-
-histo :: Functor f
-      => CVAlgebra f a -> Term f -> a
+histo :: forall a f. Functor f => CVAlgebra f a -> Term f -> a
 histo h = worker >>> attribute where
+  worker :: Term f -> Attr f a
   worker = out >>> fmap worker >>> h &&& id >>> uncurry Attr
+
+data CoAttr f a = Automatic a
+                | Manual (f (CoAttr f a))
+type CVCoalgebra f a = a -> f (CoAttr f a)
+futu :: forall a f. Functor f => CVCoalgebra f a -> a -> Term f
+futu c = In <<< fmap worker <<< c where
+  worker :: CoAttr f a -> Term f
+  worker (Automatic a) = futu c a
+  worker (Manual g)    = In $ fmap worker g
