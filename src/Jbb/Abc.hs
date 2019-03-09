@@ -13,22 +13,22 @@ data AbcF a = AF | BF a | CF a a
   deriving (Show, Eq, Ord, Functor)
 
 
--- | = convert between AbcF and Abc
+-- | == convert between AbcF and Abc
 
-unTerm_abc :: Term AbcF -> Abc
-unTerm_abc = cata iso where iso :: Algebra AbcF Abc
-                            iso AF       = A
-                            iso (BF x)   = B x
-                            iso (CF x y) = C x y
+fromTerm_abc :: Term AbcF -> Abc
+fromTerm_abc = cata iso where iso :: Algebra AbcF Abc
+                              iso AF       = A
+                              iso (BF x)   = B x
+                              iso (CF x y) = C x y
 
-term_abc :: Abc -> Term AbcF
-term_abc = ana iso where iso :: Coalgebra AbcF Abc
-                         iso A       = AF
-                         iso (B x)   = BF x
-                         iso (C x y) = CF x y
+toTerm_abc :: Abc -> Term AbcF
+toTerm_abc = ana iso where iso :: Coalgebra AbcF Abc
+                           iso A       = AF
+                           iso (B x)   = BF x
+                           iso (C x y) = CF x y
 
 
--- | = `cata` and `ana`
+-- | == `cata` and `ana`
 
 aTerm_abc :: Term AbcF
 aTerm_abc = In $ CF ( In $ BF $ In $ BF ( In $ CF ( In AF)
@@ -41,13 +41,13 @@ forCata AF       = 0
 forCata (BF i)   = 1 + i
 forCata (CF i j) = 2 + i + j
 
-forAna :: Coalgebra AbcF Int -- ^ to demo `unTerm_abc $ ana forAna 0`
+forAna :: Coalgebra AbcF Int -- ^ to demo `fromTerm_abc $ ana forAna 0`
 forAna i | i < 2     = CF (i+1) (i+1)
          | i < 4     = BF (i+1)
          | otherwise = AF
 
 
--- | = `para`, `para'` and `apo`
+-- | == `para`, `para'` and `apo`
 
 aTerm_abc_bbba :: Term AbcF
 aTerm_abc_bbba = In $ BF $ In $ BF $ In $ BF $ In AF
@@ -64,14 +64,14 @@ forPara' (In (BF (In (BF _)))) (BF i)   = 1 + i*2
 forPara' _                     (BF i)   = 1 + i
 forPara' _                     (CF i j) = 1 + i + j
 
-forApo :: RCoalgebra AbcF Int -- ^ unTerm_abc $ apo forApo 0
+forApo :: RCoalgebra AbcF Int -- ^ fromTerm_abc $ apo forApo 0
 forApo 0             = CF (Right 1) (Right 2)
 forApo 1             = BF $ Left $ In $ CF (In AF) (In AF)
 forApo i | i < 4     = BF $ Right $ i+1
          | otherwise = AF
 
 
--- | = `histo` and `futu`
+-- | == `histo` and `futu`
 
 -- | `forHisto` gives a 100 point bonus to the longer one,
 -- because at some point in the fold's history it returns 2.
@@ -86,18 +86,23 @@ forHisto abc = case abc of
           + (if history_has_a_2 a then 100 else 0)
   CF a b -> 1 + attribute a + attribute b
   where
-    history_has_a_2 :: Attr AbcF Int -> Bool -- TODO ? use `cata` here
-    history_has_a_2 (Attr 2 _)        = True
-    history_has_a_2 (Attr _ AF)       = False
-    history_has_a_2 (Attr _ (BF i))   = history_has_a_2 i
-    history_has_a_2 (Attr _ (CF i j)) = history_has_a_2 i || history_has_a_2 j
+    history_has_a_2 :: Attr AbcF Int -> Bool
+    history_has_a_2 = cata f . toTerm_attr where
+      f :: Algebra (AttrF AbcF Int) Bool
+      f (AttrF 2 _)        = True
+      f (AttrF _ AF)       = False
+      f (AttrF _ (BF b))   = b
+      f (AttrF _ (CF b c)) = b || c
 
-forFutu :: CVCoalgebra AbcF Int -- ^ unTerm_abc $ futu forFutu 0
+
+-- | = futu
+
+forFutu :: CVCoalgebra AbcF Int -- ^ fromTerm_abc $ futu forFutu 0
 forFutu i
   | i < 2 = CF (Automatic $ i+1) (Automatic $ i+2)
   | i < 4 = BF (Automatic $ i+1)
   | i < 6 = CF (Manual $ BF $ Automatic $ i+1) (Manual AF)
-    -- Here is the clause that `apo` cannot handle. When the `RCoalgebra`
+    -- Here is the clause that `apo` cannot express. When the `RCoalgebra`
     -- handed to `apo` returns a `Left`, it is a complete term.
     -- Analogously, when the `CVCoalgebra` handed to `futu` returns a
     -- `Manual` (call it "m"), there can still be some `Automatic` 

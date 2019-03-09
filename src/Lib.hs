@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Lib where
@@ -67,6 +68,25 @@ histo :: forall a f. Functor f => CVAlgebra f a -> Term f -> a
 histo h = worker >>> attribute where
   worker :: Term f -> Attr f a
   worker = out >>> fmap worker >>> h &&& id >>> uncurry Attr
+
+
+-- | = to fold an `Attr`
+
+data AttrF f a r = AttrF { attributeF :: a
+                         , holeF      :: f r } deriving (Eq, Show, Functor)
+
+fromTerm_attr :: forall a f. Functor f => Term (AttrF f a) -> Attr f a
+fromTerm_attr = cata iso where
+  iso :: Algebra (AttrF f a) (Attr f a) -- = AttrF f a (Attr f a) -> Attr f a
+  iso (AttrF a h) = Attr a h
+
+toTerm_attr :: forall a f. Functor f => Attr f a -> Term (AttrF f a)
+toTerm_attr = ana iso where
+  iso :: Coalgebra (AttrF f a) (Attr f a)
+  iso (Attr a h) = AttrF a h
+
+
+-- | = `futu`
 
 data CoAttr f a = Automatic a
                 | Manual (f (CoAttr f a))
