@@ -8,6 +8,8 @@ go curr@(Next attr) = let
 * questions
 ** Why are RAlgebra and RAlgebra' equivalent?
 https://blog.sumtypeofway.com/recursion-schemes-part-iii-folds-in-context/
+** Where is `ana`'s dual concept to `cata`'s "paired source value"?
+Symbolically, the duality is clear. Conceptually, though, why the dual of a (value, value's history) is an Either value (someting becoming a value) is mysterious to me.
 ** asked
 https://github.com/patrickt/recschemes/issues/5
 *** What's up with the cata laws?
@@ -41,3 +43,5 @@ https://github.com/patrickt/recschemes/issues/5
 *** Section III claims Section II defined ana
  "In the previous post, we defined ana, the anamorphism"
  (and section 1 makes a similar claim).
+* suggestions
+In Section 4, sometimes he uses Stop and Continue, sometimes Continue and Manual, sometimes Manual and AUtomatic.
