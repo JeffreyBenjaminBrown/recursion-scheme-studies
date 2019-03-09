@@ -6,7 +6,11 @@ https://blog.sumtypeofway.com/an-introduction-to-recursion-schemes/
 at the later of the two appearances of this phrase
 go curr@(Next attr) = let
 * questions
-** How to use a recursion scheme for Jbb.Abc.returned_2?
+** With Data.Functor.Foldable, why do I sometimes need to specify types?
+This is likely resolved in the last part of PT's blog series.
+Example, from Jbb.Ala_Kmett:
+  To demo `forAna :: Int -> Base Abc Int`,
+  I have to call `F.ana forAna 0 :: Abc`.
 ** Why are RAlgebra and RAlgebra' equivalent?
 Jbb.Abc demonstrates it -- but I still lack intuition.
 https://blog.sumtypeofway.com/recursion-schemes-part-iii-folds-in-context/

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Jbb.Abc where
+module Jbb.Abc () where
 
 import Lib
 
@@ -86,7 +86,7 @@ forHisto abc = case abc of
           + (if history_has_a_2 a then 100 else 0)
   CF a b -> 1 + attribute a + attribute b
   where
-    history_has_a_2 :: Attr AbcF Int -> Bool
+    history_has_a_2 :: Attr AbcF Int -> Bool -- Thanks to Reddit user gelisam: http://www.reddit.com/r/haskell/comments/az4w8e/a_natural_way_to_fold_over_the_history_involved/ei5cp8j/
     history_has_a_2 = cata f . toTerm_attr where
       f :: Algebra (AttrF AbcF Int) Bool
       f (AttrF 2 _)        = True
